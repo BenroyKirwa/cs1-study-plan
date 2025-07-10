@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Download, Calendar, Clock, CheckCircle, Circle, Target, MessageCircle, Edit3, Save, X, BarChart3 } from 'lucide-react';
+import { Download, Calendar, Clock, CheckCircle, Circle, Target, MessageCircle, Edit3, Save, X, BarChart3, BookOpen, Code, Upload } from 'lucide-react';
 
 function App() {
   const [userId, setUserId] = useState('');
@@ -71,7 +71,10 @@ function App() {
   useEffect(() => {
     if (!isUserIdSet) return;
     fetch(`https://cs1-study-plan-production.up.railway.app/api/progress?userId=${encodeURIComponent(userId)}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         setTasks(data.tasks || {});
         setMilestones(data.milestones || {});
@@ -88,9 +91,46 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(progressData),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => console.log(data.message))
       .catch((err) => console.error('Error saving progress:', err));
+  };
+
+  // Export progress
+  const exportProgress = () => {
+    window.location.href = `https://cs1-study-plan-production.up.railway.app/api/export-progress?userId=${encodeURIComponent(userId)}`;
+  };
+
+  // Import progress
+  const importProgress = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        fetch('https://cs1-study-plan-production.up.railway.app/api/import-progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, ...importedData }),
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+          })
+          .then((data) => {
+            setTasks(data.tasks || {});
+            setMilestones(data.milestones || {});
+            setNotes(data.notes || {});
+          })
+          .catch((err) => console.error('Error importing progress:', err));
+      } catch (err) {
+        console.error('Invalid JSON file:', err);
+      }
+    };
+    reader.readAsText(file);
   };
 
   // Toggle task
@@ -143,7 +183,7 @@ function App() {
 
   const getOverallProgress = () => {
     const allTasks = Object.values(weekData).flatMap((week) => week.days.flatMap((day) => day.tasks));
-    const completedTasks = allTasks.filter((task) => tasks[task.week]?.[task.id]).length;
+    const completedTasks = allTasks.filter((task) => tasks[week]?.[task.id]).length;
     return allTasks.length ? (completedTasks / allTasks.length) * 100 : 0;
   };
 
