@@ -12,46 +12,410 @@ function App() {
   const [editingNote, setEditingNote] = useState(null);
   const [tempNote, setTempNote] = useState('');
 
-  const weekData = {
-    1: {
-      title: 'Week 1: Foundation',
-      date: 'July 8 - July 14, 2025',
-      hours: 40,
-      days: [
-        {
-          day: 'Monday',
-          tasks: [
-            { id: 'flutter1', title: 'Flutter Setup', description: 'Install Flutter and set up IDE', hours: 4, type: 'flutter' },
-            { id: 'java1', title: 'Java Basics', description: 'Review Java syntax for BC integration', hours: 3, type: 'java' },
-          ],
+const weekData = {
+        1: {
+            title: "Week 1: Random Variables & Data Analysis",
+            date: "July 11-17, 2025",
+            hours: 17.5,
+            days: [
+                {
+                    day: "Friday, July 11",
+                    tasks: [
+                        {
+                            id: "rv_basics",
+                            title: "Review Random Variables",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Review discrete/continuous distributions, PDFs, expected values (ActEd Course Notes, Ch. 1-2). Solve 5 practice problems."
+                        },
+                        {
+                            id: "r_install",
+                            title: "Install & Learn R Basics",
+                            type: "r",
+                            hours: 1,
+                            description: "Install R 3.6.1, follow CS1B R material for basic arithmetic and loops (IFoA CS1B Guide). Write simple R script."
+                        }
+                    ]
+                },
+                {
+                    day: "Saturday, July 12",
+                    tasks: [
+                        {
+                            id: "rv_variance",
+                            title: "Variance & Covariance",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study variance, covariance, linear combinations (ActEd Course Notes, Ch. 2). Solve 5 problems on covariance."
+                        },
+                        {
+                            id: "r_distributions",
+                            title: "R: Distributions",
+                            type: "r",
+                            hours: 1,
+                            description: "Use R to compute probabilities for binomial and normal distributions (DataCamp R Basics). Save R code."
+                        }
+                    ]
+                },
+                {
+                    day: "Sunday, July 13",
+                    tasks: [
+                        {
+                            id: "data_summary",
+                            title: "Data Summarization",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Review measures of central tendency, dispersion (ActEd Course Notes, Ch. 3). Solve 5 summary stats problems."
+                        },
+                        {
+                            id: "r_plots",
+                            title: "R: Data Visualization",
+                            type: "r",
+                            hours: 1,
+                            description: "Create histograms and boxplots in R (CS1B R material). Save plots."
+                        }
+                    ]
+                },
+                {
+                    day: "Monday, July 14",
+                    tasks: [
+                        {
+                            id: "correlation",
+                            title: "Correlation Measures",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study correlation coefficients (ActEd Course Notes, Ch. 3 Scandal). Solve 3 correlation problems."
+                        },
+                        {
+                            id: "r_correlation",
+                            title: "R: Correlation Analysis",
+                            type: "r",
+                            hours: 1,
+                            description: "Compute correlation in R (CS1B R material). Save R script."
+                        }
+                    ]
+                },
+                {
+                    day: "Tuesday, July 15",
+                    tasks: [
+                        {
+                            id: "data_practice",
+                            title: "Data Analysis Practice",
+                            type: "practice",
+                            hours: 2,
+                            description: "Complete 10 data analysis problems from ActEd X1 Assignment."
+                        },
+                        {
+                            id: "r_data",
+                            title: "R: Data Summarization",
+                            type: "r",
+                            hours: 0.5,
+                            description: "Write R code for mean, median, and variance (CS1B R material)."
+                        }
+                    ]
+                },
+                {
+                    day: "Wednesday, July 16",
+                    tasks: [
+                        {
+                            id: "rv_practice",
+                            title: "Random Variables Practice",
+                            type: "practice",
+                            hours: 2,
+                            description: "Solve 10 problems on distributions and expected values (ActEd Course Notes)."
+                        },
+                        {
+                            id: "r_practice_1",
+                            title: "R Practice: Distributions",
+                            type: "r",
+                            hours: 0.5,
+                            description: "Write R code for 3 distribution problems (CS1B R material)."
+                        }
+                    ]
+                },
+                {
+                    day: "Thursday, July 17",
+                    tasks: [
+                        {
+                            id: "mock_test_1",
+                            title: "Week 1 Mock Test",
+                            type: "practice",
+                            hours: 2.5,
+                            description: "Take CS1A mock test (ActEd X2 Assignment, 80 marks, 2.75h). Log score."
+                        }
+                    ]
+                }
+            ],
+            milestones: [
+                "Reviewed random variables and data analysis topics",
+                "R basics and distribution calculations completed",
+                "Completed Week 1 mock test and practice problems"
+            ]
         },
-        {
-          day: 'Tuesday',
-          tasks: [
-            { id: 'react1', title: 'React Components', description: 'Build basic React components', hours: 4, type: 'react' },
-          ],
+        2: {
+            title: "Week 2: Statistical Inference & Regression",
+            date: "July 18-24, 2025",
+            hours: 17.5,
+            days: [
+                {
+                    day: "Friday, July 18",
+                    tasks: [
+                        {
+                            id: "inference_basics",
+                            title: "Statistical Inference Basics",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study hypothesis testing, confidence intervals (ActEd Course Notes, Ch. 4). Solve 5 problems."
+                        },
+                        {
+                            id: "r_inference",
+                            title: "R: Hypothesis Testing",
+                            type: "r",
+                            hours: 1,
+                            description: "Perform t-tests in R (CS1B R material). Save R code."
+                        }
+                    ]
+                },
+                {
+                    day: "Saturday, July 19",
+                    tasks: [
+                        {
+                            id: "inference_advanced",
+                            title: "Advanced Inference",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study p-values, power of tests (ActEd Course Notes, Ch. 4). Solve 5 problems."
+                        },
+                        {
+                            id: "r_confidence",
+                            title: "R: Confidence Intervals",
+                            type: "r",
+                            hours: 1,
+                            description: "Compute confidence intervals in R (CS1B R material). Save R code."
+                        }
+                    ]
+                },
+                {
+                    day: "Sunday, July 20",
+                    tasks: [
+                        {
+                            id: "regression_basics",
+                            title: "Linear Regression",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study simple linear regression (ActEd Course Notes, Ch. 5). Solve 5 regression problems."
+                        },
+                        {
+                            id: "r_regression",
+                            title: "R: Linear Regression",
+                            type: "r",
+                            hours: 1,
+                            description: "Run linear regression in R (CS1B R material). Save R code and output."
+                        }
+                    ]
+                },
+                {
+                    day: "Monday, July 21",
+                    tasks: [
+                        {
+                            id: "glm_basics",
+                            title: "Generalized Linear Models",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study GLMs (ActEd Course Notes, Ch. 5). Solve 5 GLM problems."
+                        },
+                        {
+                            id: "r_glm",
+                            title: "R: GLMs",
+                            type: "r",
+                            hours: 1,
+                            description: "Run GLM in R (CS1B R material). Save R code and output."
+                        }
+                    ]
+                },
+                {
+                    day: "Tuesday, July 22",
+                    tasks: [
+                        {
+                            id: "regression_practice",
+                            title: "Regression Practice",
+                            type: "practice",
+                            hours: 2,
+                            description: "Complete 10 regression problems from ActEd X3 Assignment."
+                        },
+                        {
+                            id: "r_practice_2",
+                            title: "R Practice: Regression",
+                            type: "r",
+                            hours: 0.5,
+                            description: "Write R code for 3 regression problems (CS1B R material)."
+                        }
+                    ]
+                },
+                {
+                    day: "Wednesday, July 23",
+                    tasks: [
+                        {
+                            id: "inference_practice",
+                            title: "Inference Practice",
+                            type: "practice",
+                            hours: 2,
+                            description: "Complete 10 inference problems from ActEd X4 Assignment."
+                        },
+                        {
+                            id: "r_practice_3",
+                            title: "R Practice: Inference",
+                            type: "r",
+                            hours: 0.5,
+                            description: "Write R code for 3 inference problems (CS1B R material)."
+                        }
+                    ]
+                },
+                {
+                    day: "Thursday, July 24",
+                    tasks: [
+                        {
+                            id: "mock_test_2",
+                            title: "Week 2 Mock Test",
+                            type: "practice",
+                            hours: 2.5,
+                            description: "Take CS1A mock test (ActEd Mock Exam, 100 marks, 3.25h). Log score and review weak areas."
+                        }
+                    ]
+                }
+            ],
+            milestones: [
+                "Completed statistical inference and regression topics",
+                "R code for hypothesis testing, confidence intervals, and regression",
+                "Completed Week 2 mock test and practice problems"
+            ]
         },
-      ],
-      milestones: ['Complete Flutter installation', 'Understand Java BC integration'],
-    },
-    2: {
-      title: 'Week 2: Integration',
-      date: 'July 15 - July 21, 2025',
-      hours: 40,
-      days: [
-        {
-          day: 'Monday',
-          tasks: [
-            { id: 'postgres1', title: 'PostgreSQL Setup', description: 'Set up PostgreSQL and write basic queries', hours: 4, type: 'postgres' },
-            { id: 'client1', title: 'Client Meeting Prep', description: 'Prepare for SACCO client meeting', hours: 2, type: 'client' },
-          ],
-        },
-      ],
-      milestones: ['Run PostgreSQL queries', 'Conduct client meeting'],
-    },
-    // Add more weeks as needed
-  };
-
+        3: {
+            title: "Week 3: Bayesian Statistics & Exam Prep",
+            date: "July 25-31, 2025",
+            hours: 17.5,
+            days: [
+                {
+                    day: "Friday, July 25",
+                    tasks: [
+                        {
+                            id: "bayes_basics",
+                            title: "Bayesian Statistics Basics",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study Bayesian concepts, priors, posteriors (ActEd Course Notes, Ch. 6). Solve 5 problems."
+                        },
+                        {
+                            id: "r_bayes",
+                            title: "R: Bayesian Analysis",
+                            type: "r",
+                            hours: 1,
+                            description: "Perform Bayesian analysis in R (CS1B R material). Save R code."
+                        }
+                    ]
+                },
+                {
+                    day: "Saturday, July 26",
+                    tasks: [
+                        {
+                            id: "bayes_advanced",
+                            title: "Advanced Bayesian Statistics",
+                            type: "theory",
+                            hours: 1.5,
+                            description: "Study Bayesian inference (ActEd Course Notes, Ch. 6). Solve 5 advanced problems."
+                        },
+                        {
+                            id: "r_bayes_practice",
+                            title: "R: Bayesian Practice",
+                            type: "r",
+                            hours: 1,
+                            description: "Write R code for 3 Bayesian problems (CS1B R material)."
+                        }
+                    ]
+                },
+                {
+                    day: "Sunday, July 27",
+                    tasks: [
+                        {
+                            id: "full_review",
+                            title: "Full Syllabus Review",
+                            type: "theory",
+                            hours: 2,
+                            description: "Review all CS1A topics (ActEd Revision Notes). Summarize key formulas."
+                        },
+                        {
+                            id: "r_review",
+                            title: "R Code Review",
+                            type: "r",
+                            hours: 0.5,
+                            description: "Review and optimize R code from previous tasks."
+                        }
+                    ]
+                },
+                {
+                    day: "Monday, July 28",
+                    tasks: [
+                        {
+                            id: "cs1a_mock",
+                            title: "CS1A Full Mock Exam",
+                            type: "practice",
+                            hours: 3.25,
+                            description: "Take full CS1A mock exam (ActEd Mock Exam, 100 marks). Log score and weak areas."
+                        }
+                    ]
+                },
+                {
+                    day: "Tuesday, July 29",
+                    tasks: [
+                        {
+                            id: "cs1b_mock",
+                            title: "CS1B Full Mock Exam",
+                            type: "practice",
+                            hours: 1.75,
+                            description: "Take CS1B R-based mock exam (ActEd Mock Exam, 100 marks). Log score and weak areas."
+                        }
+                    ]
+                },
+                {
+                    day: "Wednesday, July 30",
+                    tasks: [
+                        {
+                            id: "weak_area_review",
+                            title: "Weak Area Review",
+                            type: "theory",
+                            hours: 2,
+                            description: "Review weak topics from mock exams (ActEd Revision Notes). Solve 10 targeted problems."
+                        },
+                        {
+                            id: "r_weak_area",
+                            title: "R: Weak Area Practice",
+                            type: "r",
+                            hours: 0.5,
+                            description: "Write R code for 3 weak area problems (CS1B R material)."
+                        }
+                    ]
+                },
+                {
+                    day: "Thursday, July 31",
+                    tasks: [
+                        {
+                            id: "final_mock",
+                            title: "Final CS1A & CS1B Mock",
+                            type: "practice",
+                            hours: 3.5,
+                            description: "Take combined CS1A & CS1B mock exam (ActEd AMP, 100 marks each). Log final score and confirm exam readiness."
+                        }
+                    ]
+                }
+            ],
+            milestones: [
+                "Completed Bayesian statistics and full syllabus review",
+                "R code for Bayesian analysis completed",
+                "Completed CS1A & CS1B mock exams and weak area review",
+                "Exam readiness confirmed"
+            ]
+        }
+    };
+  
   // Load userId from localStorage
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
