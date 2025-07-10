@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Download, Calendar, Clock, CheckCircle, Circle, Target, MessageCircle, Edit3, Save, X, BarChart3, BookOpen, Code, Upload } from 'lucide-react';
+import { Download, Calendar, Clock, CheckCircle, Circle, Target, MessageCircle, Edit3, Save, X, BarChart3, BookOpen, Code, Upload, Smartphone, Database, Video } from 'lucide-react';
 
 function App() {
   const [userId, setUserId] = useState('');
@@ -18,26 +18,36 @@ function App() {
       date: 'July 8 - July 14, 2025',
       hours: 40,
       days: [
-        { day: 'Monday', tasks: [
-          { id: 'rv1', title: 'Introduction to Random Variables', description: 'Study discrete and continuous random variables', hours: 4, type: 'study' },
-          { id: 'r1', title: 'R Basics', description: 'Install R and learn basic syntax', hours: 3, type: 'coding' },
-        ]},
-        { day: 'Tuesday', tasks: [
-          { id: 'rv2', title: 'Probability Distributions', description: 'Explore probability mass and density functions', hours: 4, type: 'study' },
-        ]},
+        {
+          day: 'Monday',
+          tasks: [
+            { id: 'flutter1', title: 'Flutter Setup', description: 'Install Flutter and set up IDE', hours: 4, type: 'flutter' },
+            { id: 'java1', title: 'Java Basics', description: 'Review Java syntax for BC integration', hours: 3, type: 'java' },
+          ],
+        },
+        {
+          day: 'Tuesday',
+          tasks: [
+            { id: 'react1', title: 'React Components', description: 'Build basic React components', hours: 4, type: 'react' },
+          ],
+        },
       ],
-      milestones: ['Complete R installation', 'Understand random variable types'],
+      milestones: ['Complete Flutter installation', 'Understand Java BC integration'],
     },
     2: {
-      title: 'Week 2: Statistical Inference',
+      title: 'Week 2: Integration',
       date: 'July 15 - July 21, 2025',
       hours: 40,
       days: [
-        { day: 'Monday', tasks: [
-          { id: 'si1', title: 'Hypothesis Testing', description: 'Learn null and alternative hypotheses', hours: 4, type: 'study' },
-        ]},
+        {
+          day: 'Monday',
+          tasks: [
+            { id: 'postgres1', title: 'PostgreSQL Setup', description: 'Set up PostgreSQL and write basic queries', hours: 4, type: 'postgres' },
+            { id: 'client1', title: 'Client Meeting Prep', description: 'Prepare for SACCO client meeting', hours: 2, type: 'client' },
+          ],
+        },
       ],
-      milestones: ['Master hypothesis testing concepts'],
+      milestones: ['Run PostgreSQL queries', 'Conduct client meeting'],
     },
     // Add more weeks as needed
   };
@@ -107,6 +117,7 @@ function App() {
   // Import progress
   const importProgress = (event) => {
     const file = event.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -134,34 +145,44 @@ function App() {
   };
 
   // Toggle task
-  const toggleTask = (week, taskId) => {
+  const toggleTask = (weekNum, taskId) => {
     setTasks((prev) => {
-      const weekTasks = prev[week] || {};
-      const newTasks = { ...prev, [week]: { ...weekTasks, [taskId]: !weekTasks[taskId] } };
+      const newTasks = {
+        ...prev,
+        [weekNum]: {
+          ...prev[weekNum],
+          [taskId]: !prev[weekNum]?.[taskId],
+        },
+      };
       saveProgress();
       return newTasks;
     });
   };
 
   // Toggle milestone
-  const toggleMilestone = (week, index) => {
+  const toggleMilestone = (weekNum, milestoneIndex) => {
     setMilestones((prev) => {
-      const weekMilestones = prev[week] || {};
-      const newMilestones = { ...prev, [week]: { ...weekMilestones, [index]: !weekMilestones[index] } };
+      const newMilestones = {
+        ...prev,
+        [weekNum]: {
+          ...prev[weekNum],
+          [milestoneIndex]: !prev[weekNum]?.[milestoneIndex],
+        },
+      };
       saveProgress();
       return newMilestones;
     });
   };
 
   // Note editing
-  const startEditingNote = (week) => {
-    setEditingNote(week);
-    setTempNote(notes[week] || '');
+  const startEditingNote = (weekNum) => {
+    setEditingNote(weekNum);
+    setTempNote(notes[weekNum] || '');
   };
 
-  const saveNote = (week) => {
+  const saveNote = (weekNum) => {
     setNotes((prev) => {
-      const newNotes = { ...prev, [week]: tempNote };
+      const newNotes = { ...prev, [weekNum]: tempNote };
       saveProgress();
       return newNotes;
     });
@@ -175,33 +196,47 @@ function App() {
   };
 
   // Progress calculations
-  const getWeekProgress = (week) => {
-    const weekTasks = weekData[week]?.days.flatMap((day) => day.tasks) || [];
-    const completedTasks = weekTasks.filter((task) => tasks[week]?.[task.id]).length;
-    return weekTasks.length ? (completedTasks / weekTasks.length) * 100 : 0;
+  const getWeekProgress = (weekNum) => {
+    const week = weekData[weekNum];
+    if (!week) return 0;
+    const allTasks = week.days.flatMap((day) => day.tasks);
+    const completedTasks = allTasks.filter((task) => tasks[weekNum]?.[task.id]).length;
+    return allTasks.length > 0 ? (completedTasks / allTasks.length) * 100 : 0;
   };
 
   const getOverallProgress = () => {
-    const allTasks = Object.values(weekData).flatMap((week) => week.days.flatMap((day) => day.tasks));
-    const completedTasks = allTasks.filter((task) => tasks[week]?.[task.id]).length;
-    return allTasks.length ? (completedTasks / allTasks.length) * 100 : 0;
+    const totalWeeks = Object.keys(weekData).length;
+    const totalProgress = Object.keys(weekData).reduce((sum, weekNum) => {
+      return sum + getWeekProgress(parseInt(weekNum));
+    }, 0);
+    return totalWeeks > 0 ? totalProgress / totalWeeks : 0;
   };
 
   // Task type utilities
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'study': return 'border-blue-100 bg-blue-50';
-      case 'coding': return 'border-green-100 bg-green-50';
-      default: return 'border-gray-100 bg-gray-50';
-    }
+  const getTypeIcon = (type) => {
+    const icons = {
+      flutter: <Smartphone className="w-4 h-4 text-blue-500" />,
+      java: <Code className="w-4 h-4 text-orange-500" />,
+      react: <Code className="w-4 h-4 text-cyan-500" />,
+      postgres: <Database className="w-4 h-4 text-blue-600" />,
+      nav: <BookOpen className="w-4 h-4 text-purple-500" />,
+      client: <Video className="w-4 h-4 text-green-500" />,
+      portfolio: <Target className="w-4 h-4 text-pink-500" />,
+    };
+    return icons[type] || <Circle className="w-4 h-4 text-gray-500" />;
   };
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'study': return <BookOpen className="w-4 h-4 text-blue-600" />;
-      case 'coding': return <Code className="w-4 h-4 text-green-600" />;
-      default: return null;
-    }
+  const getTypeColor = (type) => {
+    const colors = {
+      flutter: 'bg-blue-50 border-blue-200',
+      java: 'bg-orange-50 border-orange-200',
+      react: 'bg-cyan-50 border-cyan-200',
+      postgres: 'bg-blue-50 border-blue-600',
+      nav: 'bg-purple-50 border-purple-200',
+      client: 'bg-green-50 border-green-200',
+      portfolio: 'bg-pink-50 border-pink-200',
+    };
+    return colors[type] || 'bg-gray-50 border-gray-200';
   };
 
   if (!isUserIdSet) {
