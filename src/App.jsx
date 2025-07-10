@@ -634,8 +634,8 @@ const weekData = {
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Career Growth Plan Tracker ({userId})</h1>
-            <p className="text-gray-600 mt-2">SACCO Development & BC Integration • July 8 - September 8, 2025</p>
+            <h1 className="text-3xl font-bold text-gray-800">CS1 Plan Tracker ({userId})</h1>
+            <p className="text-gray-600 mt-2">CS1 Exam Preparation Plan • July 8 - July 31, 2025</p>
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-center">
@@ -649,11 +649,11 @@ const weekData = {
               <Download className="w-4 h-4" />
               <span>Export Progress</span>
             </button>
-            <label className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
+            /*<label className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
               <Upload className="w-4 h-4" />
               <span>Import Progress</span>
               <input type="file" accept=".json" onChange={importProgress} className="hidden" />
-            </label>
+            </label>*/
           </div>
         </div>
 

@@ -76,6 +76,11 @@ app.post('/api/import-progress', async (req, res) => {
   }
 });
 
+app.get('/api/debug/files', async (req, res) => {
+  const files = await fs.readdir(progressDir);
+  res.json(files);
+});
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
