@@ -1,0 +1,25 @@
+{
+  "tasks": {
+    "1": {
+      "flutter_install": true,
+      "client_video_1": true,
+      "rv_basics": false,
+      "r_install": false
+    }
+  },
+  "milestones": {
+    "1": {
+      "0": false,
+      "1": false,
+      "2": false
+    },
+    "3": {
+      "0": false,
+      "1": false
+    }
+  },
+  "notes": {
+    "1": "",
+    "3": ""
+  }
+}
