@@ -9,6 +9,7 @@ const progressFilePath = path.join(__dirname, '../progress.json');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../build')));
 
 // Load progress
 app.get('/api/progress', async (req, res) => {
@@ -64,6 +65,11 @@ app.post('/api/import-progress', async (req, res) => {
         console.error('Error importing progress:', err);
         res.status(500).json({ error: 'Failed to import progress' });
     }
+});
+
+// Catch-all route for React frontend (must be last)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
 app.listen(port, () => {
