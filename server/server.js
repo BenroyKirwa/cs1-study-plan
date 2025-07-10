@@ -1,90 +1,98 @@
 const express = require('express');
-const fs = require('fs').promises;
-const path = require('path');
+const { MongoClient } = require('mongodb');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3001; // Railway uses PORT env variable
-const progressDir = path.join(__dirname, '../progress'); // Directory for user files
+const port = process.env.PORT || 3001;
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const client = new MongoClient(uri);
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
-// Ensure progress directory exists
-fs.mkdir(progressDir, { recursive: true }).catch(console.error);
-
-const getProgressFilePath = (userId) => path.join(progressDir, `progress-${userId}.json`);
+// Connect to MongoDB
+let db;
+async function connectToMongo() {
+  try {
+    await client.connect();
+    db = client.db('cs1_progress');
+    console.log('Connected to MongoDB');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+  }
+}
+connectToMongo();
 
 app.get('/api/progress', async (req, res) => {
-    const userId = req.query.userId || 'default';
-    const progressFilePath = getProgressFilePath(userId);
-    try {
-        const data = await fs.readFile(progressFilePath, 'utf8');
-        res.json(JSON.parse(data));
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            res.json({ tasks: {}, milestones: {}, notes: {} });
-        } else {
-            console.error('Error reading progress:', err);
-            res.status(500).json({ error: 'Failed to load progress' });
-        }
-    }
+  const userId = req.query.userId || 'default';
+  try {
+    const collection = db.collection('progress');
+    const progress = await collection.findOne({ userId }) || { tasks: {}, milestones: {}, notes: {} };
+    res.json(progress);
+  } catch (err) {
+    console.error('Error fetching progress:', err);
+    res.status(500).json({ error: 'Failed to fetch progress' });
+  }
 });
 
 app.post('/api/save-progress', async (req, res) => {
-    const userId = req.body.userId || 'default';
-    const progressFilePath = getProgressFilePath(userId);
-    try {
-        const progressData = req.body;
-        await fs.writeFile(progressFilePath, JSON.stringify(progressData, null, 2));
-        res.json({ message: 'Progress saved successfully' });
-    } catch (err) {
-        console.error('Error saving progress:', err);
-        res.status(500).json({ error: 'Failed to save progress' });
-    }
+  const { userId, tasks, milestones, notes } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required' });
+  }
+  try {
+    const collection = db.collection('progress');
+    await collection.updateOne(
+      { userId },
+      { $set: { userId, tasks, milestones, notes, updatedAt: new Date() } },
+      { upsert: true }
+    );
+    res.json({ message: 'Progress saved successfully' });
+  } catch (err) {
+    console.error('Error saving progress:', err);
+    res.status(500).json({ error: 'Failed to save progress' });
+  }
 });
 
 app.get('/api/export-progress', async (req, res) => {
   const userId = req.query.userId || 'default';
-  const progressFilePath = getProgressFilePath(userId);
   try {
-    const data = await fs.readFile(progressFilePath, 'utf8');
+    const collection = db.collection('progress');
+    const progress = await collection.findOne({ userId }) || { tasks: {}, milestones: {}, notes: {} };
     res.setHeader('Content-Disposition', `attachment; filename=career-progress-${userId}.json`);
     res.setHeader('Content-Type', 'application/json');
-    res.send(data);
+    res.json(progress);
   } catch (err) {
-    if (err.code === 'ENOENT') {
-      res.json({ tasks: {}, milestones: {}, notes: {} });
-    } else {
-      console.error('Error exporting progress:', err);
-      res.status(500).json({ error: 'Failed to export progress' });
-    }
+    console.error('Error exporting progress:', err);
+    res.status(500).json({ error: 'Failed to export progress' });
   }
 });
 
 app.post('/api/import-progress', async (req, res) => {
-  const userId = req.body.userId || 'default';
-  const progressFilePath = getProgressFilePath(userId);
+  const { userId, tasks, milestones, notes } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required' });
+  }
   try {
-    const progressData = req.body;
-    await fs.writeFile(progressFilePath, JSON.stringify(progressData, null, 2));
-    res.json(progressData);
+    const collection = db.collection('progress');
+    await collection.updateOne(
+      { userId },
+      { $set: { userId, tasks, milestones, notes, updatedAt: new Date() } },
+      { upsert: true }
+    );
+    res.json({ tasks, milestones, notes });
   } catch (err) {
     console.error('Error importing progress:', err);
     res.status(500).json({ error: 'Failed to import progress' });
   }
 });
 
-app.get('/api/debug/files', async (req, res) => {
-  const files = await fs.readdir(progressDir);
-  res.json(files);
-});
-
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
 app.listen(port, () => {
-    console.log(`Backend server running at port ${port}`);
+  console.log(`Backend server running at port ${port}`);
 });
