@@ -5,14 +5,20 @@ const cors = require('cors');
 
 const app = express();
 const port = 3001;
-const progressFilePath = path.join(__dirname, '../progress.json');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
+// Helper to get user-specific file path
+const getProgressFilePath = (userId) => {
+    return path.join(__dirname, `../progress-${userId}.json`);
+};
+
 // Load progress
 app.get('/api/progress', async (req, res) => {
+    const userId = req.query.userId || 'default'; // Use query param for simplicity
+    const progressFilePath = getProgressFilePath(userId);
     try {
         const data = await fs.readFile(progressFilePath, 'utf8');
         res.json(JSON.parse(data));
@@ -28,6 +34,8 @@ app.get('/api/progress', async (req, res) => {
 
 // Save progress
 app.post('/api/save-progress', async (req, res) => {
+    const userId = req.body.userId || 'default';
+    const progressFilePath = getProgressFilePath(userId);
     try {
         const progressData = req.body;
         await fs.writeFile(progressFilePath, JSON.stringify(progressData, null, 2));
@@ -40,9 +48,11 @@ app.post('/api/save-progress', async (req, res) => {
 
 // Export progress
 app.get('/api/export-progress', async (req, res) => {
+    const userId = req.query.userId || 'default';
+    const progressFilePath = getProgressFilePath(userId);
     try {
         const data = await fs.readFile(progressFilePath, 'utf8');
-        res.setHeader('Content-Disposition', 'attachment; filename=career-progress-backup.json');
+        res.setHeader('Content-Disposition', `attachment; filename=career-progress-${userId}.json`);
         res.setHeader('Content-Type', 'application/json');
         res.send(data);
     } catch (err) {
@@ -57,6 +67,8 @@ app.get('/api/export-progress', async (req, res) => {
 
 // Import progress
 app.post('/api/import-progress', async (req, res) => {
+    const userId = req.body.userId || 'default';
+    const progressFilePath = getProgressFilePath(userId);
     try {
         const progressData = req.body;
         await fs.writeFile(progressFilePath, JSON.stringify(progressData, null, 2));
@@ -67,7 +79,7 @@ app.post('/api/import-progress', async (req, res) => {
     }
 });
 
-// Catch-all route for React frontend (must be last)
+// Catch-all route for React frontend
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
