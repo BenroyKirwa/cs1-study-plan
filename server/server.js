@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3001;
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cs1_progress';
 const client = new MongoClient(uri);
 
 app.use(cors());
